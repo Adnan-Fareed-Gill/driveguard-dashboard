@@ -14,16 +14,191 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          phone: string | null
+          speed_limit_kmh: number
+          vehicle: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          speed_limit_kmh?: number
+          vehicle?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          speed_limit_kmh?: number
+          vehicle?: string | null
+        }
+        Relationships: []
+      }
+      trip_events: {
+        Row: {
+          created_at: string
+          detail: string | null
+          driver_id: string
+          id: string
+          lat: number | null
+          lng: number | null
+          occurred_at: string
+          speed_kmh: number | null
+          trip_id: string
+          type: string
+          value: number | null
+        }
+        Insert: {
+          created_at?: string
+          detail?: string | null
+          driver_id: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          occurred_at?: string
+          speed_kmh?: number | null
+          trip_id: string
+          type: string
+          value?: number | null
+        }
+        Update: {
+          created_at?: string
+          detail?: string | null
+          driver_id?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          occurred_at?: string
+          speed_kmh?: number | null
+          trip_id?: string
+          type?: string
+          value?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_events_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_events_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trips: {
+        Row: {
+          avg_speed_kmh: number
+          critical_events: number
+          current_lat: number | null
+          current_lng: number | null
+          current_speed_kmh: number | null
+          current_state: string
+          distance_km: number
+          driver_id: string
+          drowsy_events: number
+          ended_at: string | null
+          id: string
+          last_ping_at: string | null
+          max_speed_kmh: number
+          notes: string | null
+          speeding_events: number
+          started_at: string
+        }
+        Insert: {
+          avg_speed_kmh?: number
+          critical_events?: number
+          current_lat?: number | null
+          current_lng?: number | null
+          current_speed_kmh?: number | null
+          current_state?: string
+          distance_km?: number
+          driver_id: string
+          drowsy_events?: number
+          ended_at?: string | null
+          id?: string
+          last_ping_at?: string | null
+          max_speed_kmh?: number
+          notes?: string | null
+          speeding_events?: number
+          started_at?: string
+        }
+        Update: {
+          avg_speed_kmh?: number
+          critical_events?: number
+          current_lat?: number | null
+          current_lng?: number | null
+          current_speed_kmh?: number | null
+          current_state?: string
+          distance_km?: number
+          driver_id?: string
+          drowsy_events?: number
+          ended_at?: string | null
+          id?: string
+          last_ping_at?: string | null
+          max_speed_kmh?: number
+          notes?: string | null
+          speeding_events?: number
+          started_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trips_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "driver"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +325,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "driver"],
+    },
   },
 } as const
