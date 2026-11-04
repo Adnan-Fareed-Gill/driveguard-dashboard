@@ -10,33 +10,133 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedMonitorRouteImport } from './routes/_authenticated/monitor'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedTripsRouteImport } from './routes/_authenticated/trips'
+import { Route as AuthenticatedTripsTripIdRouteImport } from './routes/_authenticated/trips.$tripId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedMonitorRoute = AuthenticatedMonitorRouteImport.update({
+  id: '/monitor',
+  path: '/monitor',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTripsRoute = AuthenticatedTripsRouteImport.update({
+  id: '/trips',
+  path: '/trips',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTripsTripIdRoute =
+  AuthenticatedTripsTripIdRouteImport.update({
+    id: '/$tripId',
+    path: '/$tripId',
+    getParentRoute: () => AuthenticatedTripsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/monitor': typeof AuthenticatedMonitorRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/trips': typeof AuthenticatedTripsRouteWithChildren
+  '/trips/$tripId': typeof AuthenticatedTripsTripIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/monitor': typeof AuthenticatedMonitorRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/trips': typeof AuthenticatedTripsRouteWithChildren
+  '/trips/$tripId': typeof AuthenticatedTripsTripIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/monitor': typeof AuthenticatedMonitorRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/trips': typeof AuthenticatedTripsRouteWithChildren
+  '/_authenticated/trips/$tripId': typeof AuthenticatedTripsTripIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/forgot-password'
+    | '/reset-password'
+    | '/monitor'
+    | '/profile'
+    | '/trips'
+    | '/trips/$tripId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/forgot-password'
+    | '/reset-password'
+    | '/monitor'
+    | '/profile'
+    | '/trips'
+    | '/trips/$tripId'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/forgot-password'
+    | '/reset-password'
+    | '/_authenticated/monitor'
+    | '/_authenticated/profile'
+    | '/_authenticated/trips'
+    | '/_authenticated/trips/$tripId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +148,97 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/monitor': {
+      id: '/_authenticated/monitor'
+      path: '/monitor'
+      fullPath: '/monitor'
+      preLoaderRoute: typeof AuthenticatedMonitorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/trips': {
+      id: '/_authenticated/trips'
+      path: '/trips'
+      fullPath: '/trips'
+      preLoaderRoute: typeof AuthenticatedTripsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/trips/$tripId': {
+      id: '/_authenticated/trips/$tripId'
+      path: '/$tripId'
+      fullPath: '/trips/$tripId'
+      preLoaderRoute: typeof AuthenticatedTripsTripIdRouteImport
+      parentRoute: typeof AuthenticatedTripsRoute
+    }
   }
 }
 
+interface AuthenticatedTripsRouteChildren {
+  AuthenticatedTripsTripIdRoute: typeof AuthenticatedTripsTripIdRoute
+}
+
+const AuthenticatedTripsRouteChildren: AuthenticatedTripsRouteChildren = {
+  AuthenticatedTripsTripIdRoute: AuthenticatedTripsTripIdRoute,
+}
+
+const AuthenticatedTripsRouteWithChildren =
+  AuthenticatedTripsRoute._addFileChildren(AuthenticatedTripsRouteChildren)
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedMonitorRoute: typeof AuthenticatedMonitorRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedTripsRoute: typeof AuthenticatedTripsRouteWithChildren
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedMonitorRoute: AuthenticatedMonitorRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedTripsRoute: AuthenticatedTripsRouteWithChildren,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
