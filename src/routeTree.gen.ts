@@ -14,9 +14,11 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/_admin'
 import { Route as AuthenticatedMonitorRouteImport } from './routes/_authenticated/monitor'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedTripsRouteImport } from './routes/_authenticated/trips'
+import { Route as AuthenticatedAdminAdminRouteImport } from './routes/_authenticated/_admin/admin'
 import { Route as AuthenticatedTripsTripIdRouteImport } from './routes/_authenticated/trips.$tripId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -43,6 +45,10 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/_admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMonitorRoute = AuthenticatedMonitorRouteImport.update({
   id: '/monitor',
   path: '/monitor',
@@ -57,6 +63,11 @@ const AuthenticatedTripsRoute = AuthenticatedTripsRouteImport.update({
   id: '/trips',
   path: '/trips',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminAdminRoute = AuthenticatedAdminAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
 const AuthenticatedTripsTripIdRoute =
   AuthenticatedTripsTripIdRouteImport.update({
@@ -73,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/monitor': typeof AuthenticatedMonitorRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/trips': typeof AuthenticatedTripsRouteWithChildren
+  '/admin': typeof AuthenticatedAdminAdminRoute
   '/trips/$tripId': typeof AuthenticatedTripsTripIdRoute
 }
 export interface FileRoutesByTo {
@@ -83,6 +95,7 @@ export interface FileRoutesByTo {
   '/monitor': typeof AuthenticatedMonitorRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/trips': typeof AuthenticatedTripsRouteWithChildren
+  '/admin': typeof AuthenticatedAdminAdminRoute
   '/trips/$tripId': typeof AuthenticatedTripsTripIdRoute
 }
 export interface FileRoutesById {
@@ -92,9 +105,11 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/_admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/monitor': typeof AuthenticatedMonitorRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/trips': typeof AuthenticatedTripsRouteWithChildren
+  '/_authenticated/_admin/admin': typeof AuthenticatedAdminAdminRoute
   '/_authenticated/trips/$tripId': typeof AuthenticatedTripsTripIdRoute
 }
 export interface FileRouteTypes {
@@ -107,6 +122,7 @@ export interface FileRouteTypes {
     | '/monitor'
     | '/profile'
     | '/trips'
+    | '/admin'
     | '/trips/$tripId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -117,6 +133,7 @@ export interface FileRouteTypes {
     | '/monitor'
     | '/profile'
     | '/trips'
+    | '/admin'
     | '/trips/$tripId'
   id:
     | '__root__'
@@ -125,9 +142,11 @@ export interface FileRouteTypes {
     | '/auth'
     | '/forgot-password'
     | '/reset-password'
+    | '/_authenticated/_admin'
     | '/_authenticated/monitor'
     | '/_authenticated/profile'
     | '/_authenticated/trips'
+    | '/_authenticated/_admin/admin'
     | '/_authenticated/trips/$tripId'
   fileRoutesById: FileRoutesById
 }
@@ -176,6 +195,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/_admin': {
+      id: '/_authenticated/_admin'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/monitor': {
       id: '/_authenticated/monitor'
       path: '/monitor'
@@ -197,6 +223,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTripsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/_admin/admin': {
+      id: '/_authenticated/_admin/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminAdminRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/trips/$tripId': {
       id: '/_authenticated/trips/$tripId'
       path: '/$tripId'
@@ -206,6 +239,17 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminAdminRoute: typeof AuthenticatedAdminAdminRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminAdminRoute: AuthenticatedAdminAdminRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
 interface AuthenticatedTripsRouteChildren {
   AuthenticatedTripsTripIdRoute: typeof AuthenticatedTripsTripIdRoute
@@ -219,12 +263,14 @@ const AuthenticatedTripsRouteWithChildren =
   AuthenticatedTripsRoute._addFileChildren(AuthenticatedTripsRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedMonitorRoute: typeof AuthenticatedMonitorRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedTripsRoute: typeof AuthenticatedTripsRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedMonitorRoute: AuthenticatedMonitorRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedTripsRoute: AuthenticatedTripsRouteWithChildren,
