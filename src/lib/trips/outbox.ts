@@ -128,7 +128,7 @@ export async function flushOutbox(): Promise<number> {
       if (item.kind === "trip-start") {
         const { data, error } = await supabase
           .from("trips")
-          .insert(item.payload)
+          .insert(item.payload as never)
           .select("id")
           .single();
         if (error) throw error;
@@ -137,20 +137,19 @@ export async function flushOutbox(): Promise<number> {
       } else if (item.kind === "trip-end") {
         const { error } = await supabase
           .from("trips")
-          .update(item.payload)
+          .update(item.payload as never)
           .eq("id", realTripId);
         if (error) throw error;
       } else if (item.kind === "ping") {
         const { error } = await supabase
           .from("trips")
-          .update(item.payload)
+          .update(item.payload as never)
           .eq("id", realTripId);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("trip_events").insert({
-          ...item.payload,
-          trip_id: realTripId,
-        });
+        const { error } = await supabase
+          .from("trip_events")
+          .insert({ ...(item.payload as Record<string, unknown>), trip_id: realTripId } as never);
         if (error) throw error;
       }
       synced++;

@@ -10,9 +10,9 @@ export const Route = createFileRoute("/_authenticated/trips")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "My Trips — DriverGuard" },
+      { title: "My Trips — Drowsy Guard" },
       { name: "description", content: "Your recorded trips: distance, speeds, drowsiness and speeding events." },
-      { property: "og:title", content: "My Trips — DriverGuard" },
+      { property: "og:title", content: "My Trips — Drowsy Guard" },
       { property: "og:description", content: "Your recorded trips: distance, speeds and events." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

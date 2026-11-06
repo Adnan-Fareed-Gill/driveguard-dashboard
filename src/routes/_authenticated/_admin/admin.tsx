@@ -258,7 +258,7 @@ function AdminDashboard() {
   );
 }
 
-function StatCard({ label, value, danger, highlight }: { label: string; value?: number; danger?: boolean; highlight?: boolean }) {
+function StatCard({ label, value, danger, highlight }: { label: string; value: number | undefined; danger?: boolean; highlight?: boolean }) {
   return (
     <div className="panel p-4">
       <div className="text-[11px] text-muted-foreground">{label}</div>

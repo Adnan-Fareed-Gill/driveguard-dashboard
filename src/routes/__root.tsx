@@ -79,13 +79,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "DriverGuard — AI Driver Drowsiness Monitoring" },
+      { title: "Drowsy Guard — AI Driver Drowsiness Monitoring" },
       {
         name: "description",
         content:
           "Live in-cabin drowsiness detection, trip records, live location, weather alerts and speed monitoring for drivers and fleet admins.",
       },
-      { property: "og:title", content: "DriverGuard — AI Driver Drowsiness Monitoring" },
+      { property: "og:title", content: "Drowsy Guard — AI Driver Drowsiness Monitoring" },
       {
         property: "og:description",
         content:

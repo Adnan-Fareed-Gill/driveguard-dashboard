@@ -99,7 +99,7 @@ export function useDrowsinessDetector(
       predictRef.current = async (input: Float32Array) => {
         const t = tf.tensor(input, [1, AI_SIZE, AI_SIZE, 3]);
         try {
-          const out = model.predict(t) as { data: () => Promise<Float32Array> } & unknown;
+          const out = model.predict(t as never) as { data: () => Promise<Float32Array> };
           const data = await out.data();
           return data as Float32Array;
         } finally {
@@ -161,7 +161,7 @@ export function useDrowsinessDetector(
       const imageData = ctx.getImageData(0, 0, AI_SIZE, AI_SIZE).data;
       const input = new Float32Array(AI_SIZE * AI_SIZE * 3);
       for (let i = 0, p = 0; i < imageData.length; i += 4, p += 3) {
-        const y = imageData[i] / 255;
+        const y = (imageData[i] ?? 0) / 255;
         input[p] = y;
         input[p + 1] = y;
         input[p + 2] = y;

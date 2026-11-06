@@ -5,13 +5,13 @@ import heroImage from "@/assets/hero-night-drive.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "DriverGuard — AI Drowsiness Monitoring for Every Drive" },
+      { title: "Drowsy Guard — AI Drowsiness Monitoring for Every Drive" },
       {
         name: "description",
         content:
           "Webcam-based AI drowsiness detection, trip records, live location, weather alerts and live speed monitoring — with a dedicated admin dashboard for fleet oversight.",
       },
-      { property: "og:title", content: "DriverGuard — AI Drowsiness Monitoring for Every Drive" },
+      { property: "og:title", content: "Drowsy Guard — AI Drowsiness Monitoring for Every Drive" },
       {
         property: "og:description",
         content:
@@ -58,14 +58,14 @@ function Landing() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
             <span className="pulse-dot text-primary" aria-hidden />
-            <span className="font-display text-lg font-700 tracking-tight">DriverGuard</span>
+            <span className="font-display text-lg font-700 tracking-tight">Drowsy Guard</span>
           </div>
           <div className="flex items-center gap-3">
-            <Button asChild variant="ghost" size="sm">
+            <Button asChild size="sm" variant="ghost">
               <Link to="/auth">Sign in</Link>
             </Button>
             <Button asChild size="sm">
-              <Link to="/auth?mode=signup">Create account</Link>
+              <Link to="/auth" search={{ mode: "signup" }}>Create account</Link>
             </Button>
           </div>
         </div>
@@ -86,13 +86,13 @@ function Landing() {
             The drowsiness watchdog for every driver — and every fleet.
           </h1>
           <p className="mt-6 max-w-xl text-lg text-muted-foreground">
-            DriverGuard runs your trained AI model live in the browser, watches for closed eyes,
+            Drowsy Guard runs your trained AI model live in the browser, watches for closed eyes,
             yawning and head tilt, records every trip, and gives admins a live map, speed and
             weather oversight.
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
             <Button asChild size="lg" className="text-base">
-              <Link to="/auth?mode=signup">Start monitoring</Link>
+              <Link to="/auth" search={{ mode: "signup" }}>Start monitoring</Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="text-base">
               <Link to="/auth">Admin / driver sign in</Link>
@@ -116,7 +116,7 @@ function Landing() {
 
       <footer className="border-t border-border py-10">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 text-sm text-muted-foreground">
-          <span>DriverGuard — drive alert, arrive safe.</span>
+          <span>Drowsy Guard — drive alert, arrive safe.</span>
           <Link to="/auth" className="hover:text-foreground">
             Sign in
           </Link>

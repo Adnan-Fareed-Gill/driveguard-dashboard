@@ -52,19 +52,19 @@ export function decodeDetections(raw: Float32Array): Detection[] {
     let bestScore = 0;
     let bestClass = -1;
     for (let cls = 0; cls < CLASS_DIM; cls++) {
-      const score = raw[(BBOX_OFFSET + cls) * NUM_BOXES + box];
+      const score = raw[(BBOX_OFFSET + cls) * NUM_BOXES + box] ?? 0;
       if (score > bestScore) {
         bestScore = score;
         bestClass = cls;
       }
     }
     if (bestScore > CONFIDENCE_THRESHOLD) {
-      const centerX = raw[0 * NUM_BOXES + box];
-      const centerY = raw[1 * NUM_BOXES + box];
-      const w = raw[2 * NUM_BOXES + box];
-      const h = raw[3 * NUM_BOXES + box];
+      const centerX = raw[0 * NUM_BOXES + box] ?? 0;
+      const centerY = raw[1 * NUM_BOXES + box] ?? 0;
+      const w = raw[2 * NUM_BOXES + box] ?? 0;
+      const h = raw[3 * NUM_BOXES + box] ?? 0;
       detections.push({
-        className: CLASS_NAMES[bestClass],
+        className: CLASS_NAMES[bestClass] ?? "unknown",
         score: bestScore,
         bbox: { x: centerX - w / 2, y: centerY - h / 2, w, h },
       });

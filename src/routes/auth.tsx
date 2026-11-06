@@ -7,16 +7,20 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    mode: (search.mode as "signin" | "signup" | undefined) ?? "signin",
-    redirect: typeof search.redirect === "string" ? search.redirect : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { mode?: "signin" | "signup"; redirect?: string } => {
+    const result: { mode?: "signin" | "signup"; redirect?: string } = {};
+    const mode = search["mode"];
+    if (mode === "signup" || mode === "signin") result.mode = mode;
+    const redirect = search["redirect"];
+    if (typeof redirect === "string" && redirect.length > 0) result.redirect = redirect;
+    return result;
+  },
   head: () => ({
     meta: [
-      { title: "Sign in — DriverGuard" },
-      { name: "description", content: "Sign in to DriverGuard as a driver or fleet admin." },
-      { property: "og:title", content: "Sign in — DriverGuard" },
-      { property: "og:description", content: "Sign in to DriverGuard as a driver or fleet admin." },
+      { title: "Sign in — Drowsy Guard" },
+      { name: "description", content: "Sign in to Drowsy Guard as a driver or fleet admin." },
+      { property: "og:title", content: "Sign in — Drowsy Guard" },
+      { property: "og:description", content: "Sign in to Drowsy Guard as a driver or fleet admin." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -33,8 +37,7 @@ function AuthPage() {
   const { mode, redirect } = Route.useSearch();
   const navigate = useNavigate();
   const router = useRouter();
-  const [isSignup, setIsSignup] = useState(mode === "signup");
-  const [email, setEmail] = useState("");
+  const [isSignup, setIsSignup] = useState(mode === "signup");  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [vehicle, setVehicle] = useState("");
@@ -102,7 +105,7 @@ function AuthPage() {
       <div className="w-full max-w-md">
         <Link to="/" className="mb-8 flex items-center justify-center gap-2">
           <span className="pulse-dot text-primary" aria-hidden />
-          <span className="font-display text-lg font-bold tracking-tight">DriverGuard</span>
+          <span className="font-display text-lg font-bold tracking-tight">Drowsy Guard</span>
         </Link>
         <div className="panel p-8">
           <h1 className="font-display text-2xl font-bold">

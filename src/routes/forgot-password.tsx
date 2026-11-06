@@ -9,10 +9,10 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/forgot-password")({
   head: () => ({
     meta: [
-      { title: "Reset password — DriverGuard" },
-      { name: "description", content: "Request a DriverGuard password reset link." },
-      { property: "og:title", content: "Reset password — DriverGuard" },
-      { property: "og:description", content: "Request a DriverGuard password reset link." },
+      { title: "Reset password — Drowsy Guard" },
+      { name: "description", content: "Request a Drowsy Guard password reset link." },
+      { property: "og:title", content: "Reset password — Drowsy Guard" },
+      { property: "og:description", content: "Request a Drowsy Guard password reset link." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

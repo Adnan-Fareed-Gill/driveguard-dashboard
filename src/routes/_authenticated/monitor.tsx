@@ -16,9 +16,9 @@ export const Route = createFileRoute("/_authenticated/monitor")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Live Monitor — DriverGuard" },
+      { title: "Live Monitor — Drowsy Guard" },
       { name: "description", content: "Live drowsiness detection, speed, location and weather for your trip." },
-      { property: "og:title", content: "Live Monitor — DriverGuard" },
+      { property: "og:title", content: "Live Monitor — Drowsy Guard" },
       { property: "og:description", content: "Live drowsiness detection, speed, location and weather." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -140,6 +140,19 @@ function MonitorPage() {
     return `${h > 0 ? `${h}:` : ""}${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
   }, [durationSec]);
 
+  const handOff = detector.detections.some((d) => d.className === "Hand Off Steering Wheel" && d.score > 0.5);
+
+  // FR-7: steering-wheel hand activity — warn (throttled) when the driver's
+  // hands leave the wheel, even while otherwise alert.
+  const handOffWarnedAt = useRef(0);
+  useEffect(() => {
+    if (handOff && Date.now() - handOffWarnedAt.current > 10_000) {
+      handOffWarnedAt.current = Date.now();
+      toast.warning("Hands off steering wheel detected!");
+      navigator.vibrate?.([150, 80, 150]);
+    }
+  }, [handOff]);
+
   const banner =
     aiState === "critical"
       ? { label: "ALARM!", cls: "bg-destructive text-destructive-foreground alarm-flash" }
@@ -219,6 +232,12 @@ function MonitorPage() {
                 {aiState !== "alert" && <span className="pulse-dot" />}
                 {banner.label}
               </div>
+
+              {handOff && (
+                <div className="absolute right-4 top-4 flex items-center gap-2 rounded-full bg-warning px-4 py-2 text-sm font-bold tracking-wide text-warning-foreground">
+                  HANDS OFF WHEEL
+                </div>
+              )}
 
               {/* bounding boxes map 1:1 onto the square preview */}
               {detector.detections.map((d, i) => (

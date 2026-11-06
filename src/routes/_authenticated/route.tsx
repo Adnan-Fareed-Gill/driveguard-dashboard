@@ -71,7 +71,7 @@ function AuthenticatedLayout() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
           <Link to="/monitor" className="flex items-center gap-2">
             <span className="pulse-dot text-primary" aria-hidden />
-            <span className="font-display text-base font-bold tracking-tight">DriverGuard</span>
+            <span className="font-display text-base font-bold tracking-tight">Drowsy Guard</span>
           </Link>
 
           <nav className="flex items-center gap-1">
@@ -109,7 +109,7 @@ function AuthenticatedLayout() {
       </main>
 
       <footer className="border-t border-border py-4 text-center text-xs text-muted-foreground">
-        DriverGuard — drive alert, arrive safe.
+        Drowsy Guard — drive alert, arrive safe.
       </footer>
     </div>
   );

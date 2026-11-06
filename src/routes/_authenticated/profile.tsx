@@ -12,9 +12,9 @@ export const Route = createFileRoute("/_authenticated/profile")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Profile & settings — DriverGuard" },
+      { title: "Profile & settings — Drowsy Guard" },
       { name: "description", content: "Your driver profile and monitoring settings." },
-      { property: "og:title", content: "Profile & settings — DriverGuard" },
+      { property: "og:title", content: "Profile & settings — Drowsy Guard" },
       { property: "og:description", content: "Your driver profile and monitoring settings." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

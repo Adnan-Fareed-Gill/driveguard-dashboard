@@ -92,7 +92,8 @@ export function LiveMap({ points, path, height = 360, className = "", zoom = 13 
     }
 
     if (points.length === 1) {
-      map.setView([points[0].lat, points[0].lng], Math.max(map.getZoom(), zoom), { animate: true });
+      const first = points[0];
+      if (first) map.setView([first.lat, first.lng], Math.max(map.getZoom(), zoom), { animate: true });
     } else if (points.length > 1) {
       const bounds = L.latLngBounds(points.map((p) => [p.lat, p.lng] as [number, number]));
       map.fitBounds(bounds.pad(0.25));

@@ -4,7 +4,14 @@
 // through the database before returning any cross-driver data.
 
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database } from "@/integrations/supabase/types";
+
+interface AuthedContext {
+  supabase: SupabaseClient<Database>;
+  userId: string;
+}
 
 export interface AdminLiveDriver {
   tripId: string;
@@ -63,7 +70,7 @@ export interface AdminOverview {
   };
 }
 
-async function requireAdmin(context: { supabase: ReturnType<typeof requireSupabaseAuth> extends never ? never : any; userId: string }) {
+async function requireAdmin(context: AuthedContext) {
   const { data: isAdmin, error } = await context.supabase.rpc("has_role", {
     _user_id: context.userId,
     _role: "admin",
@@ -74,8 +81,9 @@ async function requireAdmin(context: { supabase: ReturnType<typeof requireSupaba
 export const getAdminOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<AdminOverview> => {
-    await requireAdmin(context as never);
-    const supabase = context.supabase;
+    const ctx = context as AuthedContext;
+    await requireAdmin(ctx);
+    const supabase = ctx.supabase;
 
     const since = new Date(Date.now() - 3 * 60_000).toISOString(); // pinged within 3 minutes = live
     const startOfDay = new Date();
@@ -197,8 +205,9 @@ export const getAdminDriverDetail = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { driverId: string }) => input)
   .handler(async ({ data, context }) => {
-    await requireAdmin(context as never);
-    const supabase = context.supabase;
+    const ctx = context as AuthedContext;
+    await requireAdmin(ctx);
+    const supabase = ctx.supabase;
 
     const [{ data: profile }, { data: trips }, { data: events }] = await Promise.all([
       supabase.from("profiles").select("*").eq("id", data.driverId).maybeSingle(),
