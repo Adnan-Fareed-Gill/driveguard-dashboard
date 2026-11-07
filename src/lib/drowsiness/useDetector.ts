@@ -37,6 +37,17 @@ const MODEL_URL = "/models/drowsiness.tflite";
 const AI_SIZE = 320;
 const INFER_INTERVAL_MS = 350;
 
+type TFLiteModel = {
+  predict: (input: unknown) => unknown;
+};
+
+type TFLiteRuntimeGlobal = typeof globalThis & {
+  tf?: typeof import("@tensorflow/tfjs");
+  tflite?: {
+    loadTFLiteModel: (modelUrl: string) => Promise<TFLiteModel>;
+  };
+};
+
 export function useDrowsinessDetector(
   videoRef: React.RefObject<HTMLVideoElement | null>,
   enabled: boolean,
@@ -92,9 +103,13 @@ export function useDrowsinessDetector(
     setState((s) => ({ ...s, status: "loading-model" }));
     try {
       const tf = await import("@tensorflow/tfjs");
-      const tflite = await import("@tensorflow/tfjs-tflite");
       await tf.ready();
-      const model = await tflite.loadTFLiteModel(MODEL_URL);
+      const tfliteGlobal = globalThis as TFLiteRuntimeGlobal;
+      tfliteGlobal.tf = tf;
+      await import("@tensorflow/tfjs-tflite/dist/tf-tflite.es2017.js");
+      const loadTFLiteModel = tfliteGlobal.tflite?.loadTFLiteModel;
+      if (!loadTFLiteModel) throw new Error("TensorFlow Lite runtime did not initialize.");
+      const model = await loadTFLiteModel(MODEL_URL);
 
       predictRef.current = async (input: Float32Array) => {
         const t = tf.tensor(input, [1, AI_SIZE, AI_SIZE, 3]);

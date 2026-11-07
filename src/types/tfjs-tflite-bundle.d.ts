@@ -1,0 +1,1 @@
+declare module "@tensorflow/tfjs-tflite/dist/tf-tflite.es2017.js";
