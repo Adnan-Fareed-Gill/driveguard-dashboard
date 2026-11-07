@@ -7,8 +7,10 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (search: Record<string, unknown>): { mode?: "signin" | "signup"; redirect?: string } => {
-    const result: { mode?: "signin" | "signup"; redirect?: string } = {};
+  validateSearch: (search: Record<string, unknown>): { mode?: "signin" | "signup"; redirect?: string; portal?: "driver" | "admin" } => {
+    const result: { mode?: "signin" | "signup"; redirect?: string; portal?: "driver" | "admin" } = {};
+    const portal = search["portal"];
+    if (portal === "admin" || portal === "driver") result.portal = portal;
     const mode = search["mode"];
     if (mode === "signup" || mode === "signin") result.mode = mode;
     const redirect = search["redirect"];
@@ -28,13 +30,23 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-function safeRedirect(raw: string | undefined): string {
-  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/";
+// UX hint only — the signup trigger is what actually grants the admin role.
+const ADMIN_EMAIL = "adnanfareed516@gmail.com";
+
+function safeRedirect(raw: string | undefined): string | null {
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return null;
   return raw;
 }
 
+async function fetchRole(userId: string): Promise<"admin" | "driver"> {
+  const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+  return data?.some((r) => r.role === "admin") ? "admin" : "driver";
+}
+
 function AuthPage() {
-  const { mode, redirect } = Route.useSearch();
+  const { mode, redirect, portal: portalParam } = Route.useSearch();
+  const portal = portalParam ?? "driver";
+  const isAdminPortal = portal === "admin";
   const navigate = useNavigate();
   const router = useRouter();
   const [isSignup, setIsSignup] = useState(mode === "signup");  const [email, setEmail] = useState("");
@@ -45,30 +57,49 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
   const [awaitingConfirm, setAwaitingConfirm] = useState(false);
 
-  const destination = safeRedirect(redirect);
+  const requested = safeRedirect(redirect);
+  const home = isAdminPortal ? "/admin" : "/monitor";
+
+  async function enterPortal(userId: string) {
+    const role = await fetchRole(userId);
+    if (role !== portal) {
+      await supabase.auth.signOut();
+      throw new Error(
+        role === "admin"
+          ? "This account is a Fleet Admin account. Please use the Admin portal."
+          : "This account is a Fleet Driver account. Please use the Driver portal.",
+      );
+    }
+    await router.invalidate();
+    const allowed = requested && (role === "admin" ? requested.startsWith("/admin") : !requested.startsWith("/admin"));
+    await navigate({ to: allowed ? requested : home });
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     try {
       if (!isSignup) {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        await router.invalidate();
-        await navigate({ to: destination });
+        await enterPortal(data.user.id);
       } else {
+        const isAdminEmail = email.trim().toLowerCase() === ADMIN_EMAIL;
+        if (isAdminPortal && !isAdminEmail)
+          throw new Error("Admin accounts can only be created with the authorised fleet admin email.");
+        if (!isAdminPortal && isAdminEmail)
+          throw new Error("This email is reserved for the Fleet Admin. Please use the Admin portal.");
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: window.location.origin + destination,
+            emailRedirectTo: `${window.location.origin}/auth?portal=${portal}`,
             data: { full_name: fullName, vehicle, phone },
           },
         });
         if (error) throw error;
-        if (data.session) {
-          await router.invalidate();
-          await navigate({ to: destination });
+        if (data.session && data.user) {
+          await enterPortal(data.user.id);
         } else {
           setAwaitingConfirm(true);
         }
@@ -93,7 +124,7 @@ function AuthPage() {
             to activate your account, then sign in.
           </p>
           <Button variant="outline" className="mt-6" asChild>
-            <Link to="/auth">Back to sign in</Link>
+            <Link to="/auth" search={{ portal }}>Back to sign in</Link>
           </Button>
         </div>
       </div>
@@ -107,18 +138,43 @@ function AuthPage() {
           <span className="pulse-dot text-primary" aria-hidden />
           <span className="font-display text-lg font-bold tracking-tight">Drowsy Guard</span>
         </Link>
+        <div className="mb-4 grid grid-cols-2 gap-1 rounded-lg border border-border bg-secondary/40 p-1">
+          {(["driver", "admin"] as const).map((p) => (
+            <Link
+              key={p}
+              to="/auth"
+              search={{ portal: p, mode: isSignup ? "signup" : "signin" }}
+              className={`rounded-md px-3 py-2 text-center text-sm font-medium transition-colors ${portal === p ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              {p === "driver" ? "Fleet Driver" : "Fleet Admin"}
+            </Link>
+          ))}
+        </div>
         <div className="panel p-8">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-primary">
+            {isAdminPortal ? "Admin portal" : "Driver portal"}
+          </p>
           <h1 className="font-display text-2xl font-bold">
             {isSignup ? "Create your account" : "Welcome back"}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {isSignup
-              ? "Driver accounts start monitoring right away."
-              : "Sign in to your driver or admin dashboard."}
+            {isAdminPortal
+              ? isSignup
+                ? "Register the authorised fleet admin account."
+                : "Sign in to the fleet control room."
+              : isSignup
+                ? "Driver accounts start monitoring right away."
+                : "Sign in to your driver dashboard."}
           </p>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-            {isSignup && (
+            {isSignup && isAdminPortal && (
+              <div className="space-y-2">
+                <Label htmlFor="fullName">Full name</Label>
+                <Input id="fullName" required value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Fleet manager" />
+              </div>
+            )}
+            {isSignup && !isAdminPortal && (
               <>
                 <div className="space-y-2">
                   <Label htmlFor="fullName">Full name</Label>

@@ -30,11 +30,20 @@ function AuthenticatedLayout() {
   useEffect(() => {
     if (session.loading) return;
     if (!session.user) {
-      navigate({ to: "/auth", search: { redirect: router.state.location.href } });
-    } else {
-      setChecked(true);
+      const href = router.state.location.href;
+      navigate({ to: "/auth", search: { redirect: href, portal: href.startsWith("/admin") ? "admin" : "driver" } });
+      return;
     }
-  }, [session.loading, session.user, navigate, router]);
+    if (!session.role) return; // wait for role
+    const path = router.state.location.pathname;
+    const onAdmin = path.startsWith("/admin");
+    if (session.role === "admin" && !onAdmin && path !== "/profile") {
+      navigate({ to: "/admin", replace: true });
+    } else if (session.role === "driver" && onAdmin) {
+      navigate({ to: "/monitor", replace: true });
+    }
+    setChecked(true);
+  }, [session.loading, session.user, session.role, navigate, router]);
 
   if (session.loading || !checked) {
     return (
@@ -57,7 +66,7 @@ function AuthenticatedLayout() {
     await queryClient.cancelQueries();
     queryClient.clear();
     await supabaseSignOut();
-    navigate({ to: "/auth", replace: true });
+    navigate({ to: "/auth", search: { portal: session.role === "admin" ? "admin" : "driver" }, replace: true });
   }
 
   async function supabaseSignOut() {
@@ -69,15 +78,20 @@ function AuthenticatedLayout() {
     <div className="flex min-h-screen flex-col bg-background">
       <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
-          <Link to="/monitor" className="flex items-center gap-2">
+          <Link to={session.role === "admin" ? "/admin" : "/monitor"} className="flex items-center gap-2">
             <span className="pulse-dot text-primary" aria-hidden />
             <span className="font-display text-base font-bold tracking-tight">Drowsy Guard</span>
           </Link>
 
           <nav className="flex items-center gap-1">
-            <NavLink to="/monitor">Monitor</NavLink>
-            <NavLink to="/trips">My Trips</NavLink>
-            {session.role === "admin" && <NavLink to="/admin">Admin</NavLink>}
+            {session.role === "admin" ? (
+              <NavLink to="/admin">Admin dashboard</NavLink>
+            ) : (
+              <>
+                <NavLink to="/monitor">Monitor</NavLink>
+                <NavLink to="/trips">My Trips</NavLink>
+              </>
+            )}
           </nav>
 
           <DropdownMenu>
