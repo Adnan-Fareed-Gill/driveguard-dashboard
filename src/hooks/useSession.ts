@@ -34,7 +34,20 @@ export function useSession() {
       supabase.from("user_roles").select("role").eq("user_id", userId),
     ]);
     const role = roles?.some((r) => r.role === "admin") ? "admin" : roles?.length ? "driver" : null;
-    setState((s) => ({ ...s, profile: (profile as Profile) ?? null, role }));
+    let p = (profile as Profile) ?? null;
+    // Copy vehicle/phone entered at signup into the profile on first sign-in.
+    if (p && (!p.vehicle || !p.phone)) {
+      const { data: u } = await supabase.auth.getUser();
+      const meta = (u.user?.user_metadata ?? {}) as Record<string, string | undefined>;
+      const patch: { vehicle?: string; phone?: string } = {};
+      if (!p.vehicle && meta["vehicle"]) patch.vehicle = meta["vehicle"];
+      if (!p.phone && meta["phone"]) patch.phone = meta["phone"];
+      if (Object.keys(patch).length) {
+        const { error } = await supabase.from("profiles").update(patch).eq("id", userId);
+        if (!error) p = { ...p, ...patch };
+      }
+    }
+    setState((s) => ({ ...s, profile: p, role }));
   }, []);
 
   useEffect(() => {
