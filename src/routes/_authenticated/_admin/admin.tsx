@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { getAdminOverview, type AdminOverview } from "@/server/admin";
+import { getAdminOverview, type AdminOverview } from "@/lib/admin.functions";
 import { LiveMap, type MapPoint } from "@/components/LiveMap";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
